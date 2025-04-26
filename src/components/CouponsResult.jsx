@@ -1,45 +1,72 @@
 import { useState } from "react";
 import coupom from "/coupom.png";
 
-export default function CouponsResult({ coupons, initialDate, finalDate, setInitialDate, setFinalDate, dateRange }) {
- 
-    return (
-    <div className="bg-emerald-700 w-1/2 p-32 h-full">
-      <div className="flex flex-row">
-        <div>
-          <img src={coupom} width={"96px"} />
-        </div>
-        <div className="pt-8 text-white"> Total: {coupons} cupons em {dateRange} dia(s)</div>
+export default function CouponsResult({
+  coupons,
+  startDate,
+  endDate,
+  handleStartDate,
+  handleEndDate,
+  dateRange,
+}) {
+
+  return (
+    <div className="bg-zinc-800 rounded-2xl shadow-lg p-6 w-full max-w-xl mx-auto text-white flex flex-col gap-6">
+      <div className="flex items-center gap-4">
+        <img src={coupom} width="64" alt="Cupom" />
+        <h2 className="text-2xl font-bold text-green-400">
+          Total:{" "}
+          <span className="text-white font-mono">{coupons ?? 0} cps</span> em{" "}
+          {dateRange} dia(s)
+        </h2>
       </div>
 
-      <div className="mt-12">
-        <label htmlFor="initialDate" className="text-white">
+      <div className="flex flex-col gap-2">
+        <label htmlFor="initialDate" className="text-sm text-zinc-300">
           Data Inicial
         </label>
         <input
           type="date"
           id="initialDate"
-          value={initialDate}
-          onChange={(e) => setInitialDate(e.target.value)}
-          className="ml-2"
+          value={startDate}
+          onChange={handleStartDate}
+          className="bg-zinc-700 text-white px-3 py-2 rounded-md border border-zinc-600"
         />
       </div>
 
-      <div className="mt-6">
-        <label htmlFor="finalDate" className="text-white">
+      <div className="flex flex-col gap-2">
+        <label htmlFor="finalDate" className="text-sm text-zinc-300">
           Data Final
         </label>
         <input
           type="date"
           id="finalDate"
-          value={finalDate}
-          onChange={(e) => setFinalDate(e.target.value)}
-          className="ml-2"
+          value={endDate}
+          onChange={handleEndDate}
+          className="bg-zinc-700 text-white px-3 py-2 rounded-md border border-zinc-600"
         />
       </div>
 
-      <div>
-        <h3> OBS: Os valores devem ser colocados <b>por dia</b> <br/>ou seja: se você realiza 3 transportes por dia, coloque 3 no valor. <br/> Considere: 1 mês = 30 dias.</h3>
+      <div className="bg-zinc-700 p-4 rounded-lg text-sm text-zinc-300 leading-relaxed">
+        <p>
+          <b className="text-green-400">Observação:</b> os valores devem ser
+          colocados <b>por dia</b>.
+        </p>
+        <p className="mt-1">
+          Exemplo: se você realiza 3 transportes por dia, coloque <b>3</b> no
+          campo.
+        </p>
+        <p className="mt-1 italic text-xs">
+          * Considerando 1 mês como 30 dias.
+        </p>
+      </div>
+      <div className="bg-zinc-700 p-4 rounded-lg text-sm text-zinc-300 leading-relaxed">
+        <p className="mt-1">
+          A calculadora tem o propósito de{" "}
+          <b className="text-green-400">estimar</b> o total de cupons com base
+          nas datas e está considerando que todas as recompensas estão sendo
+          coletadas de forma constante.
+        </p>
       </div>
     </div>
   );
