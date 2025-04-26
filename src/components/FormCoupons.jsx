@@ -1,106 +1,91 @@
-import { useState } from "react";
-import coupomImg from "/coupom.png";
-export default function FormCoupons({ options, setTotalCoupons, dateRange }) {
-  const [eventos, setEventos] = useState(
-    options.reduce((acc, curr) => {
-      acc[curr.name] = { ativo: false, vezes: curr.unique ? 1 : 0, qtd_mes: curr.qtd_mes };
-      return acc;
-    }, {})
-  );
-
-  const handleResults = () => {
-    const total = options.reduce((sum, opt) => {
-      const evento = eventos[opt.name];
-      console.log(evento.name)
-      
-      return evento.ativo ? sum + evento.vezes * opt.coupons : sum;
-    }, 0);
-
-    console.log(total);
-    setTotalCoupons(total);
-  };
+export default function FormCoupons({
+  events,
+  selectEvents,
+  selectedEvents,
+  selectedSelectEvents,
+  checkBoxChange,
+  quantityChange,
+  handleSelectEventChange,
+  handleSelectEventValueChange,
+  resultFunction,
+}) {
   return (
-    <div className="bg-green-700 w-1/2 pt-6 flex flex-col h-full gap-2">
-      {options.map((option, index) => (
-        <div key={index} className="flex flex-row">
-          <div className="flex w-1/2 items-center justify-center gap-1">
-            <label htmlFor={`coupon-${index}`} className="text-white text-md">
-              {option.name}
+    <>
+      <div className="bg-zinc-800 rounded-2xl shadow-lg p-6 w-full max-w-xl mx-auto flex flex-col gap-6 text-white">
+        <h2 className="text-2xl font-bold text-green-400"> Eventos Fixos</h2>
+
+        {events.map((event) => (
+          <div key={event.name} className="flex justify-between items-center">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={!!selectedEvents[event.name]}
+                onChange={() => checkBoxChange(event.name)}
+                className="accent-green-500 w-4 h-4"
+              />
+              {event.name}{" "}
+              <span className="text-green-300">({event.coupons} cps)</span>
             </label>
+
+            {!!selectedEvents[event.name] && (
+              <input
+                type="number"
+                min="1"
+                className="w-20 px-2 py-1 rounded bg-zinc-700 border border-zinc-600 text-white"
+                value={selectedEvents[event.name].qtdPorDia}
+                onChange={(e) => quantityChange(event.name, e.target.value)}
+                placeholder="Qtd"
+              />
+            )}
           </div>
-          <div className="flex w-1/2 items-center justify-center gap-1">
-            <input
-              type="checkbox"
-              checked={eventos[option.name].ativo}
-              onChange={() =>
-                setEventos((prev) => ({
-                  ...prev,
-                  [option.name]: {
-                    ...prev[option.name],
-                    ativo: !prev[option.name].ativo,
-                  },
-                }))
-              }
-            />
-            {!option.unique && (
-              <>
+        ))}
+      </div>
+      <div className="bg-zinc-800 rounded-2xl shadow-lg p-6 w-full max-w-xl mx-auto flex flex-col gap-6 text-white">
+        <h2 className="text-2xl font-bold text-green-400">Eventos Variáveis</h2>
+        {selectEvents.map((event) => {
+          const selected = selectedSelectEvents[event.name];
+          return (
+            <div key={event.name} className="flex flex-col gap-2">
+              <label className="flex items-center gap-2">
                 <input
-                  key={option}
-                  type="number"
-                  value={eventos[option.name].vezes}
+                  type="checkbox"
+                  checked={!!selected}
                   onChange={(e) =>
-                    setEventos((prev) => ({
-                      ...prev,
-                      [option.name]: {
-                        ...prev[option.name],
-                        vezes: Number(e.target.value),
-                      },
-                    }))
+                    handleSelectEventChange(event.name, e.target.checked)
                   }
-                  id={`coupon-${index}`}
-                  name={`coupon-${option.name}`}
-                  className="h-5 w-12 bg-gray-300"
+                  className="accent-green-500 w-4 h-4"
                 />
-                <div className="flex flex-row pl-6">
-                  <div className="pt-3">
-                    <span>{option.coupons * eventos[option.name].vezes}</span>
-                  </div>{" "}
-                  <div>
-                    <img width={"48px"} src={coupomImg} />
-                  </div>
+                {event.name}
+              </label>
+
+              {selected && (
+                <div className="flex items-center gap-4">
+                  <input
+                    type="range"
+                    min={event.min_coupons}
+                    max={event.max_coupons}
+                    value={selected.valorSelecionado}
+                    onChange={(e) =>
+                      handleSelectEventValueChange(event.name, e.target.value)
+                    }
+                    className="w-full accent-green-500"
+                  />
+                  <span className="font-mono text-green-300">
+                    {selected.valorSelecionado} cps
+                  </span>
                 </div>
-              </>
-            )}
-            {option.unique && (
-              <>
-                <input
-                  type="number"
-                  value="1"
-                  readOnly
-                  id={`coupon-${index}`}
-                  name={`coupon-${option.name}`}
-                  className="h-5 w-12 bg-gray-600"
-                  onChange={handleResults}
-                />
-                <div className="flex flex-row pl-6">
-                  <div className="pt-3">
-                    <span>{option.coupons * eventos[option.name].vezes}</span>
-                  </div>{" "}
-                  <div>
-                    <img width={"48px"} src={coupomImg} />
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      ))}
-      <button
-        className="bg-gray-800 p-1 text-gray-400 hover:text-white"
-        onClick={handleResults}
-      >
-        Calcular
-      </button>
-    </div>
+              )}
+            </div>
+          );
+        })}
+
+        <button
+          className="bg-green-600 text-white font-bold py-2 mt-6 rounded-xl hover:bg-green-500 transition-all duration-200 hover:scale-105"
+          onClick={resultFunction}
+        >
+          Calcular Cupons
+        </button>
+      </div>
+    </>
   );
 }
