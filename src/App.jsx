@@ -186,7 +186,7 @@ export default function App() {
       <Header />
       <main>
         <div className="bg-black flex flex-col">
-          <div className="bg-green-800 h-[100vh]">
+          <div className="bg-green-800 h-[150vh]">
             <div className="flex justify-center items-center mt-24">
               <h1 className="font-bold text-4xl text-gray-300 m-auto">
                 Bem vindo(a) a calculadora de cupons do jogo Naruto Online
