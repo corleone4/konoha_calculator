@@ -26,14 +26,23 @@ export default function FormCoupons({
               {event.name}{" "}
               <span className="text-green-300">({event.coupons} cps)</span>
             </label>
-
-            {!!selectedEvents[event.name] && (
+            {!!selectedEvents[event.name] && !event.unique && (
               <input
                 type="number"
                 min="1"
                 className="w-20 px-2 py-1 rounded bg-zinc-700 border border-zinc-600 text-white"
                 value={selectedEvents[event.name].qtdPorDia}
                 onChange={(e) => quantityChange(event.name, e.target.value)}
+                placeholder="Qtd"
+              />
+            )}
+
+            {!!selectedEvents[event.name] && event.unique && (
+              <input
+                type="text"
+                readOnly
+                className="w-20 px-2 py-1 rounded bg-zinc-700 border border-zinc-600 text-white"
+                value="1"
                 placeholder="Qtd"
               />
             )}

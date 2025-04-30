@@ -6,69 +6,22 @@ import CouponsResult from "./components/CouponsResult";
 const EVENTS = [
   { name: "Transporte", coupons: 40, unique: false, qtd_mes: 30, max_value: 3 },
   { name: "Saque", coupons: 50, unique: false, qtd_mes: 30, max_value: 3 },
-  {
-    name: "Mensal (50 cps)",
-    coupons: 50,
-    unique: true,
-    qtd_mes: 30,
-    max_value: 1,
-  },
-  {
-    name: "Mensal (100 cps)",
-    coupons: 100,
-    unique: true,
-    qtd_mes: 30,
-    max_value: 1,
-  },
-  {
-    name: "Roleta da Guilda",
-    coupons: 30,
-    unique: true,
-    qtd_mes: 30,
-    max_value: 1,
-  },
+  { name: "Mensal (50 cps)", coupons: 50, unique: true, qtd_mes: 30, max_value: 1 },
+  { name: "Mensal (100 cps)", coupons: 100, unique: true, qtd_mes: 30, max_value: 1 },
+  { name: "Roleta da Guilda", coupons: 30, unique: true, qtd_mes: 30, max_value: 1 },
   { name: "Ajuda-Ninja", coupons: 70, unique: true, qtd_mes: 1, max_value: 1 },
-  {
-    name: "7 Dias de Férias",
-    coupons: 50,
-    unique: true,
-    qtd_mes: 1,
-    max_value: 1,
-  },
-  {
-    name: "Treino de Jutsus",
-    coupons: 140,
-    unique: true,
-    qtd_mes: 1,
-    max_value: 1,
-  },
+  { name: "7 Dias de Férias", coupons: 50, unique: true, qtd_mes: 1, max_value: 1 },
+  { name: "Treino de Jutsus", coupons: 140, unique: true, qtd_mes: 1, max_value: 1 },
   { name: "Lanterna", coupons: 350, unique: true, qtd_mes: 1, max_value: 1 },
   { name: "Martelinho", coupons: 1150, unique: true, qtd_mes: 1, max_value: 1 },
   { name: "Semanal", coupons: 80, unique: true, qtd_mes: 1, max_value: 1 },
-  {
-    name: "Invocação da Guilda",
-    coupons: 320,
-    unique: false,
-    qtd_mes: 1,
-    max_value: 1,
-  },
-  { name: "Check-in", coupons: 200, unique: true, qtd_mes: 1, max_value: 1 },
-  {
-    name: "Câmara dos Tesouros dos Sennin",
-    coupons: 140,
-    unique: false,
-    qtd_mes: 1,
-    max_value: 1,
-  },
-  {
-    name: "Festival das Flores de Cerejeira",
-    coupons: 140,
-    unique: false,
-    qtd_mes: 1,
-    max_value: 1,
-  },
+  { name: "Invocação da Guilda", coupons: 320, unique: false, qtd_mes: 1, max_value: 1 },
+  { name: "Check-in", coupons: 200, unique: true, qtd_mes: 1, max_value: 1  },
+  { name: "Câmara dos Tesouros dos Sennin", coupons: 140, unique: false, qtd_mes: 1, max_value: 1 },
+  { name: "Festival das Flores de Cerejeira", coupons: 140 ,unique: false, qtd_mes: 1, max_value: 1 },
 ];
 
+// Eventos com faixa de valores
 const SELECT_EVENTS = [
   {
     name: "Benefícios Semanais",
@@ -111,26 +64,6 @@ const SELECT_EVENTS = [
     max_coupons: 25,
   },
 ];
-
-// semana de rotação base: 03/04/2025 (quinta-feira)
-const ROTATING_EVENTS = [
-  ["7 Dias de Férias", "Festival das Flores de Cerejeira"],
-  ["Câmara dos Tesouros dos Sennin"],
-  ["Lanterna", "Treino de Jutsus", "Ajuda-Ninja"],
-  ["Martelinho"],
-];
-
-function getRotationIndexForDate(date) {
-  const baseDate = new Date("2025-04-03");
-  const inputDate = new Date(date);
-  const diffTime = inputDate - baseDate;
-  const diffWeeks = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7));
-  const index =
-    ((diffWeeks % ROTATING_EVENTS.length) + ROTATING_EVENTS.length) %
-    ROTATING_EVENTS.length;
-  return index;
-}
-
 function getDate() {
   const today = new Date();
   const month = String(today.getMonth() + 1).padStart(2, "0");
@@ -153,48 +86,50 @@ export default function App() {
   const handleCheckboxChange = (name) => {
     setSelectedEvents((prev) => {
       const isActive = !!prev[name];
-
+  
       if (isActive) {
         const updated = { ...prev };
         delete updated[name];
         return updated;
       }
-
+      
       if (name === "Transporte" || name === "Saque") {
         const other = name === "Transporte" ? "Saque" : "Transporte";
         const otherQtd = prev[other]?.qtdPorDia || 0;
         if (otherQtd >= 3) return prev;
       }
-
+  
       return {
         ...prev,
         [name]: { qtdPorDia: 1 },
       };
     });
   };
-
+  
+  
   // quando o user ja marcou a checkbox:
   // qtdPorDia vai ser sobrescrito pelo valor digitado no input.
   const handleQtdChange = (name, value) => {
     const evento = EVENTS.find((ev) => ev.name === name);
     if (!evento) return;
-
+  
     setSelectedEvents((prev) => {
       const outroNome = name === "Transporte" ? "Saque" : "Transporte";
       const outroQtd = prev[outroNome]?.qtdPorDia || 0;
       const novoValor = Number(value);
-
+  
       // Bloqueia se a soma ultrapassar 3
       if (novoValor + outroQtd > 3 || novoValor > evento.max_value) {
         return prev;
       }
-
+  
       return {
         ...prev,
         [name]: { qtdPorDia: novoValor },
       };
     });
   };
+  
 
   // checkbox de evento com faixa
   const handleSelectEventChange = (name, isChecked) => {
@@ -236,49 +171,15 @@ export default function App() {
     const dias = calcularDias();
     let total = 0;
 
-    // Para rotativos que só podem ocorrer 1 vez por mês
-    const rotatingUsages = {}; // { "Martelinho": Set(["2025-04", "2025-05"]) }
-
-    for (let i = 0; i < dias; i++) {
-      const currentDate = new Date(startDate);
-      currentDate.setDate(currentDate.getDate() + i);
-
-      const rotationIndex = getRotationIndexForDate(currentDate);
-      const currentWeekEvents = ROTATING_EVENTS[rotationIndex];
-
-      const currentMonth = currentDate.getMonth(); // 0 a 11
-      const currentYear = currentDate.getFullYear();
-      const monthKey = `${currentYear}-${currentMonth}`;
-
-      for (const eventName of currentWeekEvents) {
-        const event = EVENTS.find((e) => e.name === eventName);
-        if (!event || !selectedEvents[event.name]) continue;
-
-        const vezesPorDia = selectedEvents[event.name].qtdPorDia || 1;
-
-        if (event.unique && event.qtd_mes === 1) {
-          if (!rotatingUsages[event.name]) {
-            rotatingUsages[event.name] = new Set();
-          }
-
-          if (!rotatingUsages[event.name].has(monthKey)) {
-            total += event.coupons;
-            rotatingUsages[event.name].add(monthKey);
-          }
-        }
-      }
-    }
-
-    // Eventos fixos (não rotativos)
+    // fixos
     for (const event of EVENTS) {
-      if (ROTATING_EVENTS.flat().includes(event.name)) continue;
-
       const data = selectedEvents[event.name];
       if (!data) continue;
 
       const vezesPorDia = data.qtdPorDia || 1;
 
-      if (event.unique) {
+      if (event.unique) { 
+        // limita pelos usos únicos no mês proporcional
         if (event.qtd_mes >= 30) {
           total += event.coupons * Math.min(vezesPorDia, 1) * dias;
         } else {
@@ -286,10 +187,20 @@ export default function App() {
           total += event.coupons * Math.min(vezesPorDia, maxUsos);
         }
       } else {
+        // evento diário comum
         total += event.coupons * vezesPorDia * dias;
       }
+      
+      
+      // if (event.unique) {
+      //   const maxUsos = Math.floor(event.qtd_mes * (dias / 30));
+      //   total += event.coupons * Math.min(vezesPorDia, maxUsos);
+      // } else {
+      //   total += event.coupons * vezesPorDia * dias;
+      // }
     }
 
+    // eventos com faixa de valores
     for (const event of SELECT_EVENTS) {
       const data = selectedSelectEvents[event.name];
       if (!data) continue;
@@ -301,7 +212,6 @@ export default function App() {
 
     setResult(total);
   };
-
   return (
     <>
       <Header />
